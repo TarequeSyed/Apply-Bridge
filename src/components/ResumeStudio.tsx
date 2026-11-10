@@ -56,7 +56,7 @@ export const ResumeStudio: React.FC<ResumeStudioProps> = ({
   const [hfApiKey, setHfApiKey] = useState<string>(() => localStorage.getItem('applybridge_hf_api_key') || import.meta.env.VITE_HUGGINGFACE_API_KEY || '');
   const [geminiApiKey, setGeminiApiKey] = useState<string>(() => userProfile.geminiApiKey || import.meta.env.VITE_GEMINI_API_KEY || '');
   const [groqApiKey, setGroqApiKey] = useState<string>(() => localStorage.getItem('applybridge_groq_api_key') || import.meta.env.VITE_GROQ_API_KEY || '');
-  const [hfModel, setHfModel] = useState<string>('meta-llama/Meta-Llama-3-8B-Instruct');
+  const [hfModel, setHfModel] = useState<string>('mistralai/Mistral-7B-Instruct-v0.3');
   const [showKeyConfig, setShowKeyConfig] = useState<boolean>(false);
 
   // Auto-detect which model has a key in .env or storage
@@ -459,8 +459,9 @@ export const ResumeStudio: React.FC<ResumeStudioProps> = ({
                     onChange={(e) => setHfModel(e.target.value)}
                     className="bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:border-lime-500"
                   >
-                    <option value="meta-llama/Meta-Llama-3-8B-Instruct">Llama 3 8B Instruct</option>
-                    <option value="mistralai/Mistral-7B-Instruct-v0.2">Mistral 7B Instruct</option>
+                    <option value="mistralai/Mistral-7B-Instruct-v0.3">Mistral 7B Instruct v0.3 (Recommended - Ungated)</option>
+                    <option value="mistralai/Mistral-7B-Instruct-v0.2">Mistral 7B Instruct v0.2</option>
+                    <option value="meta-llama/Meta-Llama-3-8B-Instruct">Meta Llama 3 8B (Requires Gated License Approval)</option>
                     <option value="Qwen/Qwen2.5-72B-Instruct">Qwen 2.5 72B Instruct</option>
                   </select>
                   <a

@@ -30,7 +30,7 @@ export class AIService {
         : (import.meta.env.VITE_GROQ_API_KEY || localStorage.getItem('applybridge_groq_api_key') || '')
     ).trim();
 
-    const defaultHfModel = preferred?.hfModel || 'meta-llama/Meta-Llama-3-8B-Instruct';
+    const defaultHfModel = preferred?.hfModel || 'mistralai/Mistral-7B-Instruct-v0.3';
 
     // 1. If preferred provider has an active key, honor choice
     if (preferred?.provider === 'gemini' && geminiKey) {
@@ -700,7 +700,7 @@ Return ONLY a valid JSON array of objects with this shape:
     apiKey: string,
     modelName?: string
   ): Promise<TranslatedExperience | null> {
-    const model = modelName || 'meta-llama/Meta-Llama-3-8B-Instruct';
+    const model = modelName || 'mistralai/Mistral-7B-Instruct-v0.3';
     const prompt = `Convert this informal experience for "${targetRoleOrJD}" into 3 executive ATS bullet variants. Return ONLY valid JSON: {"original": "string", "impactVariant": "string", "technicalVariant": "string", "leadershipVariant": "string", "keywordsTargeted": ["string"]}\nExperience: ${rawExperience}`;
     const res = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
       method: 'POST',
@@ -748,7 +748,7 @@ Return ONLY a valid JSON array of objects with this shape:
     apiKey: string,
     modelName?: string
   ): Promise<ATSAnalysisResult | null> {
-    const model = modelName || 'meta-llama/Meta-Llama-3-8B-Instruct';
+    const model = modelName || 'mistralai/Mistral-7B-Instruct-v0.3';
     const prompt = `Evaluate candidate resume against JD. Return ONLY valid JSON: {"score": 85, "matchedKeywords": ["string"], "missingKeywords": ["string"], "strengths": ["string"], "improvements": ["string"], "passProbability": "High"}\nJD: ${jd.slice(0, 1200)}\nResume: ${resume.slice(0, 1200)}`;
     const res = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
       method: 'POST',
