@@ -1,0 +1,80 @@
+<svg width="128" height="128" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ab-left-front" x1="10%" y1="90%" x2="50%" y2="10%">
+      <stop offset="0%" stop-color="#4ade80" />
+      <stop offset="45%" stop-color="#a3e635" />
+      <stop offset="100%" stop-color="#bef264" />
+    </linearGradient>
+
+    <linearGradient id="ab-left-inner" x1="15%" y1="90%" x2="50%" y2="20%">
+      <stop offset="0%" stop-color="#15803d" />
+      <stop offset="60%" stop-color="#16a34a" />
+      <stop offset="100%" stop-color="#65a30d" />
+    </linearGradient>
+
+    <linearGradient id="ab-apex-fold" x1="40%" y1="5%" x2="70%" y2="35%">
+      <stop offset="0%" stop-color="#ecfccb" />
+      <stop offset="50%" stop-color="#a3e635" />
+      <stop offset="100%" stop-color="#65a30d" />
+    </linearGradient>
+
+    <linearGradient id="ab-right-front" x1="50%" y1="10%" x2="90%" y2="90%">
+      <stop offset="0%" stop-color="#a3e635" />
+      <stop offset="40%" stop-color="#84cc16" />
+      <stop offset="100%" stop-color="#4d7c0f" />
+    </linearGradient>
+
+    <linearGradient id="ab-right-edge" x1="60%" y1="15%" x2="90%" y2="90%">
+      <stop offset="0%" stop-color="#d9f99d" />
+      <stop offset="60%" stop-color="#a3e635" />
+      <stop offset="100%" stop-color="#65a30d" />
+    </linearGradient>
+
+    <linearGradient id="ab-cross-front" x1="30%" y1="65%" x2="65%" y2="60%">
+      <stop offset="0%" stop-color="#4ade80" />
+      <stop offset="50%" stop-color="#a3e635" />
+      <stop offset="100%" stop-color="#bef264" />
+    </linearGradient>
+
+    <linearGradient id="ab-cross-under" x1="40%" y1="80%" x2="68%" y2="60%">
+      <stop offset="0%" stop-color="#052e16" />
+      <stop offset="50%" stop-color="#14532d" />
+      <stop offset="100%" stop-color="#166534" />
+    </linearGradient>
+
+    <linearGradient id="ab-inner-shadow" x1="50%" y1="35%" x2="50%" y2="65%">
+      <stop offset="0%" stop-color="#0f291e" />
+      <stop offset="100%" stop-color="#14532d" />
+    </linearGradient>
+  </defs>
+
+  <g>
+    <!-- Inner shadow -->
+    <polygon points="44,76 66,60 56,60" fill="url(#ab-inner-shadow)" opacity="0.9" />
+
+    <!-- Under-fold Ribbon -->
+    <polygon points="34,64 45,78 68,88 56,62" fill="url(#ab-cross-under)" />
+
+    <!-- Left Leg Inner Facet -->
+    <polygon points="6,88 28,88 48,24 38,16" fill="url(#ab-left-inner)" />
+
+    <!-- Left Leg Front Face -->
+    <polygon points="6,88 18,60 48,10 38,16" fill="url(#ab-left-front)" />
+
+    <!-- Apex Fold -->
+    <polygon points="48,10 60,18 48,24 38,16" fill="url(#ab-apex-fold)" />
+
+    <!-- Right Leg Main Facet -->
+    <polygon points="60,18 88,88 68,88 48,24" fill="url(#ab-right-front)" />
+
+    <!-- Right Leg Highlight Bevel -->
+    <polygon points="56,15 88,88 82,88 48,10" fill="url(#ab-right-edge)" opacity="0.85" />
+
+    <!-- Origami Crossbar Front -->
+    <polygon points="34,64 66,60 56,62 44,76" fill="url(#ab-cross-front)" />
+
+    <!-- Highlight Edge -->
+    <polygon points="34,64 56,62 55,60 34,62" fill="#ecfccb" opacity="0.9" />
+  </g>
+</svg>
+
