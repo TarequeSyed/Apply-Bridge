@@ -84,8 +84,8 @@ export const ApplicationKanban: React.FC<ApplicationKanbanProps> = ({
         </button>
       </div>
 
-      {/* Responsive Grid: Strictly vertical flow, NO horizontal scroll. Extra columns wrap to bottom */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 pb-8 pt-2 items-start">
+      {/* 3 Columns Max Per Row: Applied, Screening, Interviewing on Row 1; Offer & Archived on Row 2 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8 pt-2 items-start">
         {columns.map((col) => {
           const colApps = applications.filter((app) => app.status === col.id);
 
