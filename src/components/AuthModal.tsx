@@ -49,9 +49,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         return;
       }
       const user = await FirebaseAuthService.signInWithGoogle();
-      setSuccessMsg(`Welcome back, ${user.displayName}!`);
-      setTimeout(() => onAuthSuccess(user), 700);
+      if (user) {
+        setSuccessMsg(`Welcome back, ${user.displayName}!`);
+        onAuthSuccess(user);
+      }
     } catch (err: any) {
+      console.error('Google sign-in error:', err);
       setErrorMsg(err.message || 'Google sign-in failed. Please verify your .env configuration.');
     } finally {
       setIsLoading(false);

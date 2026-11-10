@@ -46,19 +46,45 @@ export function App() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [copiedNudgeId, setCopiedNudgeId] = useState<string | null>(null);
 
+  // Centralized auth success handler
+  const handleAuthSuccess = (user: AuthUser) => {
+    setCurrentUser(user);
+    setShowLandingPage(false);
+    setIsAuthModalOpen(false);
+    showToast(`Welcome, ${user.displayName || user.email}!`);
+
+    // Automatically sync authenticated user profile into local vault
+    if (user.displayName || user.email) {
+      db.userProfile.toArray().then((profiles) => {
+        const first = profiles[0];
+        if (first?.id) {
+          db.userProfile.update(first.id, {
+            fullName: user.displayName || first.fullName,
+            email: user.email || first.email,
+          });
+        }
+      });
+    }
+  };
+
   // Initialize DB and Auth on mount
   useEffect(() => {
     initializeDatabase().catch(console.error);
     setIsGmailConnected(!!GmailApiService.getAccessToken());
 
-    // Preload Firebase Auth and check for redirect result (in case browser blocked popup)
-    FirebaseAuthService.preload().catch(console.error);
-    FirebaseAuthService.checkRedirectResult().then((user) => {
+    // Preload Firebase Auth and subscribe to live auth changes (handles popup & redirect)
+    let unsubscribe = () => {};
+    FirebaseAuthService.subscribeToAuthChanges((user) => {
       if (user) {
-        setCurrentUser(user);
-        setShowLandingPage(false);
+        handleAuthSuccess(user);
       }
+    }).then((unsub) => {
+      unsubscribe = unsub;
     }).catch(console.error);
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   // Reactive DB queries via Dexie
@@ -335,12 +361,7 @@ export function App() {
           isOpen={isAuthModalOpen}
           onClose={() => setIsAuthModalOpen(false)}
           initialTab={authModalTab}
-          onAuthSuccess={(user) => {
-            setCurrentUser(user);
-            setIsAuthModalOpen(false);
-            setShowLandingPage(false);
-            showToast(`Authenticated as ${user.displayName || user.email}!`);
-          }}
+          onAuthSuccess={handleAuthSuccess}
         />
         {toastMessage && (
           <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl bg-slate-900 text-white text-xs font-semibold shadow-2xl animate-in slide-in-from-bottom-2 duration-150 border border-slate-700">
@@ -554,11 +575,7 @@ export function App() {
           isOpen={isAuthModalOpen}
           onClose={() => setIsAuthModalOpen(false)}
           initialTab={authModalTab}
-          onAuthSuccess={(user) => {
-            setCurrentUser(user);
-            setIsAuthModalOpen(false);
-            showToast(`Active account: ${user.displayName || user.email}`);
-          }}
+          onAuthSuccess={handleAuthSuccess}
         />
       )}
 

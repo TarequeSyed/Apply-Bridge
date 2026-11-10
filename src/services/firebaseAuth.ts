@@ -156,6 +156,43 @@ export class FirebaseAuthService {
   }
 
   /**
+   * Subscribes to Firebase live auth state changes.
+   * Crucial for Google Sign-In redirect and popup completion!
+   */
+  static async subscribeToAuthChanges(callback: (user: AuthUser | null) => void): Promise<() => void> {
+    try {
+      if (!this.isConfigured()) return () => {};
+      const auth = await this.getAuth();
+      // @ts-ignore
+      const { onAuthStateChanged } = await import(/* @vite-ignore */ 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+      
+      const unsubscribe = onAuthStateChanged(auth, (firebaseUser: any) => {
+        if (firebaseUser) {
+          const authUser: AuthUser = {
+            uid: firebaseUser.uid,
+            displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Candidate',
+            email: firebaseUser.email || '',
+            photoURL: firebaseUser.photoURL || undefined,
+          };
+          this.setCurrentUser(authUser);
+          callback(authUser);
+        } else {
+          // If demo user is active, don't overwrite with null
+          const current = this.getCurrentUser();
+          if (!current?.isDemo) {
+            this.setCurrentUser(null);
+            callback(null);
+          }
+        }
+      });
+      return unsubscribe;
+    } catch (err) {
+      console.warn('onAuthStateChanged subscription error:', err);
+      return () => {};
+    }
+  }
+
+  /**
    * Checks if user completed authentication via redirect fallback
    */
   static async checkRedirectResult(): Promise<AuthUser | null> {
