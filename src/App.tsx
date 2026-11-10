@@ -67,12 +67,26 @@ export function App() {
     }
   };
 
+  // Automatically dismiss landing page whenever authenticated user is present
+  useEffect(() => {
+    if (currentUser) {
+      setShowLandingPage(false);
+    }
+  }, [currentUser]);
+
   // Initialize DB and Auth on mount
   useEffect(() => {
     initializeDatabase().catch(console.error);
     setIsGmailConnected(!!GmailApiService.getAccessToken());
 
-    // Preload Firebase Auth and subscribe to live auth changes (handles popup & redirect)
+    // 1. Process any pending OAuth redirect result (crucial for redirect auth flow)
+    FirebaseAuthService.checkRedirectResult().then((user) => {
+      if (user) {
+        handleAuthSuccess(user);
+      }
+    }).catch(console.error);
+
+    // 2. Preload Firebase Auth and subscribe to live auth changes (handles popup & background session)
     let unsubscribe = () => {};
     FirebaseAuthService.subscribeToAuthChanges((user) => {
       if (user) {
@@ -374,7 +388,7 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f8fa] text-slate-800 flex font-sans selection:bg-lime-200 selection:text-slate-900">
+    <div className="min-h-screen bg-[#f6f8fa] text-slate-800 flex font-sans selection:bg-lime-200 selection:text-slate-900 overflow-x-hidden">
       
       {/* Left Sidebar (Matching Schematic) */}
       <Sidebar

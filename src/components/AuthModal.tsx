@@ -61,6 +61,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
+  const handleGoogleRedirectSignIn = async () => {
+    setErrorMsg(null);
+    setIsLoading(true);
+
+    try {
+      if (!isConfigured) {
+        setErrorMsg('Firebase credentials must be defined in your .env file before connecting Google Auth.');
+        setIsLoading(false);
+        return;
+      }
+      await FirebaseAuthService.signInWithGoogleRedirect();
+    } catch (err: any) {
+      console.error('Google redirect sign-in error:', err);
+      setErrorMsg(err.message || 'Redirect sign-in failed. Please verify your .env configuration.');
+      setIsLoading(false);
+    }
+  };
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
@@ -157,6 +175,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <span>Strict Security: Zero permissions granted without authenticated session.</span>
           </div>
 
+          {/* Feedback Messages */}
+          {errorMsg && (
+            <div className="p-3 rounded-xl bg-rose-50 border-2 border-slate-900 text-xs text-rose-900 font-bold flex items-center gap-2 animate-in fade-in duration-150">
+              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+              <span className="leading-snug">{errorMsg}</span>
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="p-3 rounded-xl bg-lime-50 border-2 border-slate-900 text-xs text-lime-900 font-bold flex items-center gap-2 animate-in fade-in duration-150">
+              <Check className="w-4 h-4 text-lime-700 flex-shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+          )}
+
           {/* Google Sign-in Brutalist Button */}
           <button
             type="button"
@@ -184,6 +217,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </svg>
             <span>Continue with Google</span>
           </button>
+
+          {/* Fallback for strict browser popup/cookie blockers */}
+          <div className="flex items-center justify-between text-[11px] px-1 text-slate-500 font-medium">
+            <span>Popup blocked or not redirecting?</span>
+            <button
+              type="button"
+              onClick={handleGoogleRedirectSignIn}
+              className="text-slate-900 underline font-extrabold hover:text-slate-700 cursor-pointer"
+            >
+              Try Redirect Sign-In
+            </button>
+          </div>
 
           <div className="flex items-center gap-3 text-xs text-slate-400 font-bold uppercase tracking-wider">
             <span className="flex-1 h-0.5 bg-slate-200"></span>
@@ -261,21 +306,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <span>1-Click Hackathon Demo Access (Alex Morgan)</span>
             </button>
           </div>
-
-          {/* Feedback Messages */}
-          {errorMsg && (
-            <div className="p-3 rounded-xl bg-rose-50 border-2 border-slate-900 text-xs text-rose-900 font-bold flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          {successMsg && (
-            <div className="p-3 rounded-xl bg-lime-50 border-2 border-slate-900 text-xs text-lime-900 font-bold flex items-center gap-2">
-              <Check className="w-4 h-4 text-lime-700 flex-shrink-0" />
-              <span>{successMsg}</span>
-            </div>
-          )}
 
         </div>
       </div>

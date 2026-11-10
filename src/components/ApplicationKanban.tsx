@@ -84,15 +84,15 @@ export const ApplicationKanban: React.FC<ApplicationKanbanProps> = ({
         </button>
       </div>
 
-      {/* Horizontal Scrolling Kanban Columns with generous breathing room (min-w: 320px) */}
-      <div className="flex gap-6 overflow-x-auto pb-8 pt-2 items-start snap-x">
+      {/* Responsive Grid: Strictly vertical flow, NO horizontal scroll. Extra columns wrap to bottom */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 pb-8 pt-2 items-start">
         {columns.map((col) => {
           const colApps = applications.filter((app) => app.status === col.id);
 
           return (
             <div
               key={col.id}
-              className="w-[320px] sm:w-[340px] flex-shrink-0 bg-slate-100/60 rounded-3xl border border-slate-200/70 p-4 flex flex-col min-h-[580px] snap-start"
+              className="w-full bg-slate-100/60 rounded-3xl border border-slate-200/70 p-4 flex flex-col min-h-[420px]"
             >
               {/* Column Header */}
               <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-slate-200/60 px-1">

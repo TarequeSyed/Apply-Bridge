@@ -156,6 +156,18 @@ export class FirebaseAuthService {
   }
 
   /**
+   * Google Sign-In with full-page redirect (bypasses all browser popup blockers & COOP cross-origin policies)
+   */
+  static async signInWithGoogleRedirect(): Promise<void> {
+    const auth = await this.getAuth();
+    // @ts-ignore
+    const { signInWithRedirect, GoogleAuthProvider } = await import(/* @vite-ignore */ 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    await signInWithRedirect(auth, provider);
+  }
+
+  /**
    * Subscribes to Firebase live auth state changes.
    * Crucial for Google Sign-In redirect and popup completion!
    */
