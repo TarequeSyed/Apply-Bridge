@@ -100,26 +100,86 @@ export class FirebaseAuthService {
   }
 
   /**
-   * Google Sign-In with Firebase popup
+   * Preloads Firebase App + Auth ESM modules so window.open or popup is triggered synchronously
+   */
+  static async preload(): Promise<void> {
+    try {
+      if (this.isConfigured()) {
+        await this.getAuth();
+      }
+    } catch {
+      // Ignore background preload errors
+    }
+  }
+
+  /**
+   * Google Sign-In with Firebase popup (with redirect fallback for strict browser popup blockers)
    */
   static async signInWithGoogle(): Promise<AuthUser> {
     const auth = await this.getAuth();
     // @ts-ignore
-    const { signInWithPopup, GoogleAuthProvider } = await import(/* @vite-ignore */ 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const { signInWithPopup, signInWithRedirect, GoogleAuthProvider } = await import(/* @vite-ignore */ 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
 
     const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+    provider.setCustomParameters({ prompt: 'select_account' });
 
-    const authUser: AuthUser = {
-      uid: user.uid,
-      displayName: user.displayName || user.email?.split('@')[0] || 'Candidate',
-      email: user.email || '',
-      photoURL: user.photoURL || undefined,
-    };
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-    this.setCurrentUser(authUser);
-    return authUser;
+      const authUser: AuthUser = {
+        uid: user.uid,
+        displayName: user.displayName || user.email?.split('@')[0] || 'Candidate',
+        email: user.email || '',
+        photoURL: user.photoURL || undefined,
+      };
+
+      this.setCurrentUser(authUser);
+      return authUser;
+    } catch (popupErr: any) {
+      console.warn('Google Popup error:', popupErr);
+
+      if (popupErr.code === 'auth/popup-blocked') {
+        console.warn('Popup blocked by browser. Falling back to signInWithRedirect...');
+        await signInWithRedirect(auth, provider);
+        return new Promise(() => {}); // Wait for redirect to complete
+      }
+
+      if (popupErr.code === 'auth/unauthorized-domain') {
+        throw new Error(
+          `Domain "${window.location.hostname}" is not authorized in Firebase. Please add "${window.location.hostname}" to Firebase Console -> Authentication -> Settings -> Authorized domains.`
+        );
+      }
+
+      throw popupErr;
+    }
+  }
+
+  /**
+   * Checks if user completed authentication via redirect fallback
+   */
+  static async checkRedirectResult(): Promise<AuthUser | null> {
+    try {
+      if (!this.isConfigured()) return null;
+      const auth = await this.getAuth();
+      // @ts-ignore
+      const { getRedirectResult } = await import(/* @vite-ignore */ 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+      const result = await getRedirectResult(auth);
+      if (result && result.user) {
+        const user = result.user;
+        const authUser: AuthUser = {
+          uid: user.uid,
+          displayName: user.displayName || user.email?.split('@')[0] || 'Candidate',
+          email: user.email || '',
+          photoURL: user.photoURL || undefined,
+        };
+        this.setCurrentUser(authUser);
+        return authUser;
+      }
+    } catch (err) {
+      console.warn('Error checking redirect result:', err);
+    }
+    return null;
   }
 
   /**

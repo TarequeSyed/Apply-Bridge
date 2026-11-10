@@ -46,10 +46,19 @@ export function App() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [copiedNudgeId, setCopiedNudgeId] = useState<string | null>(null);
 
-  // Initialize DB on mount
+  // Initialize DB and Auth on mount
   useEffect(() => {
     initializeDatabase().catch(console.error);
     setIsGmailConnected(!!GmailApiService.getAccessToken());
+
+    // Preload Firebase Auth and check for redirect result (in case browser blocked popup)
+    FirebaseAuthService.preload().catch(console.error);
+    FirebaseAuthService.checkRedirectResult().then((user) => {
+      if (user) {
+        setCurrentUser(user);
+        setShowLandingPage(false);
+      }
+    }).catch(console.error);
   }, []);
 
   // Reactive DB queries via Dexie
