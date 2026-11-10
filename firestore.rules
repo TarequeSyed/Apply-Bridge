@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================================
+    // GLOBAL SECURITY POLICY: Zero unauthenticated permissions (Default Deny All)
+    // =========================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // =========================================================================
+    // HELPER SECURITY FUNCTIONS
+    // =========================================================================
+    function isAuthenticated() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && (
+        resource != null && resource.data.userId == request.auth.uid
+      );
+    }
+
+    function isValidIncomingDoc() {
+      return isAuthenticated() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // =========================================================================
+    // USER PROFILES & PRIVATE SETTINGS
+    // =========================================================================
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Subcollections (PII records, encrypted vault keys, user activity)
+      match /{subcollection=**} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // =========================================================================
+    // APPLICATION PIPELINE CARDS
+    // Only the authenticated candidate who created the application can read/modify
+    // =========================================================================
+    match /applications/{applicationId} {
+      allow read, delete: if isDocOwner();
+      allow create: if isValidIncomingDoc();
+      allow update: if isDocOwner() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // =========================================================================
+    // RECRUITER COMMUNICATIONS & THREADS
+    // Strictly air-gapped to the authenticated candidate
+    // =========================================================================
+    match /communications/{commId} {
+      allow read, delete: if isDocOwner();
+      allow create: if isValidIncomingDoc();
+      allow update: if isDocOwner() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // =========================================================================
+    // SMART CLIPBOARD DOCK SNIPPETS
+    // =========================================================================
+    match /snippets/{snippetId} {
+      allow read, delete: if isDocOwner();
+      allow create: if isValidIncomingDoc();
+      allow update: if isDocOwner() && request.resource.data.userId == request.auth.uid;
+    }
+  }
+}
+

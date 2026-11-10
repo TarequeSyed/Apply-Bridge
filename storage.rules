@@ -1,0 +1,25 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // =========================================================================
+    // GLOBAL SECURITY POLICY: Deny all unauthenticated read/writes by default
+    // =========================================================================
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // =========================================================================
+    // CANDIDATE RESUMES & PORTFOLIO ASSETS
+    // Strictly restricted to the authenticated candidate matching their UID
+    // =========================================================================
+    match /resumes/{userId}/{fileName} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /user_uploads/{userId}/{fileName} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+
