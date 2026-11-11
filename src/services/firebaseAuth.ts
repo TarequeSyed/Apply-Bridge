@@ -293,6 +293,23 @@ export class FirebaseAuthService {
   }
 
   /**
+   * Local Offline Candidate Sign-In
+   * Allows any user cloning the repo to log in with their custom name/email
+   * without needing to configure Firebase cloud credentials.
+   */
+  static signInLocally(email: string, displayName?: string): AuthUser {
+    const safeEmail = email.trim() || 'candidate@applybridge.local';
+    const localUser: AuthUser = {
+      uid: `local-${Date.now()}`,
+      displayName: displayName?.trim() || safeEmail.split('@')[0] || 'Local Candidate',
+      email: safeEmail,
+      isDemo: true,
+    };
+    this.setCurrentUser(localUser);
+    return localUser;
+  }
+
+  /**
    * Gets current active authenticated user from storage
    */
   static getCurrentUser(): AuthUser | null {

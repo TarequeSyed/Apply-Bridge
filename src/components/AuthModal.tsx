@@ -44,7 +44,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     try {
       if (!isConfigured) {
-        setErrorMsg('Firebase credentials must be defined in your .env file before connecting Google Auth.');
+        setErrorMsg('Google Sign-In requires Firebase in .env. You can sign in with any name/email below (Local Offline Mode) or use 1-Click Demo!');
         setIsLoading(false);
         return;
       }
@@ -86,8 +86,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     try {
       if (!isConfigured) {
-        setErrorMsg('Firebase credentials must be defined in your .env file before signing in.');
-        setIsLoading(false);
+        // Effortless local login for cloned repos without .env configuration
+        const user = FirebaseAuthService.signInLocally(email, fullName);
+        setSuccessMsg(`Welcome, ${user.displayName}! (Signed in via Local Offline Mode)`);
+        setTimeout(() => onAuthSuccess(user), 600);
         return;
       }
 
@@ -174,6 +176,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <Lock className="w-4 h-4 text-slate-900 flex-shrink-0" />
             <span>Strict Security: Zero permissions granted without authenticated session.</span>
           </div>
+
+          {/* Local Sandbox Notice for Cloned Repos without Firebase */}
+          {!isConfigured && (
+            <div className="p-2.5 rounded-xl bg-amber-50 border-2 border-slate-900 text-[11px] text-amber-950 font-bold flex items-start gap-2 shadow-[2px_2px_0px_#0f172a]">
+              <Sparkles className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <span className="uppercase text-amber-900 font-black">Local Sandbox Mode:</span> Firebase is unconfigured in .env. You can enter any name & email below to log in immediately, or use 1-Click Demo!
+              </div>
+            </div>
+          )}
 
           {/* Feedback Messages */}
           {errorMsg && (

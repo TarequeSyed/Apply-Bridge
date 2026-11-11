@@ -195,6 +195,13 @@ VITE_GROQ_API_KEY=your_groq_api_key
 ```
 
 > [!NOTE]
+> **Zero-Setup Local Quickstart:** If you don't have Firebase or Google OAuth credentials yet, you can still test ApplyBridge locally! Simply run `npm run dev` and click **"Instant Demo"** or enter any name and email to enter the local offline sandbox with full Dexie.js persistence.
+> 
+> **Google Cloud Console OAuth Setup:** When creating your Web application OAuth Client ID:
+> * **Authorized JavaScript Origins:** `http://localhost:5173` (local dev) and `https://apply-bridge-pi.vercel.app` (production Vercel) — *do not include trailing slashes*.
+> * **Authorized Redirect URIs:** `http://localhost:5173` (local dev callback) and `https://applybridge2.firebaseapp.com/__/auth/handler` (production Vercel & Firebase Auth callback).
+> * *Pro-Tip:* Adding both origins and both redirect URIs to the same OAuth client allows one single Client ID to work everywhere without re-configuration!
+> 
 > All credentials are strictly read at build/runtime from `.env`. Client-side tampering of credentials in production is disabled, and `.env` is fully excluded from git tracking.
 
 ### 4. Start Local Development Server
